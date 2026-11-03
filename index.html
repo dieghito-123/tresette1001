@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Tresette 1001 — Dieghito vs Mitch</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg: #111315;
+      --card: #1b1e22;
+      --card2: #23272c;
+      --text: #f4f4f4;
+      --muted: #9ba3ad;
+      --border: #30353b;
+
+      --diego: #e0a33a;
+      --mitch: #4aa3df;
+
+      --success: #56c596;
+      --danger: #e36a6a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top, #252a30 0%, #151719 35%, #0e0f11 100%);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 28px));
+      margin: auto;
+      padding: 28px 0 70px;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: clamp(32px, 7vw, 60px);
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .scoreboard {
+      background: linear-gradient(145deg, #202429, #15181b);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.24);
+    }
+
+    .score-main {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .player {
+      min-width: 0;
+    }
+
+    .player:last-child {
+      text-align: right;
+    }
+
+    .player-name {
+      font-size: clamp(18px, 4vw, 28px);
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .score {
+      font-size: clamp(46px, 12vw, 88px);
+      line-height: .95;
+      font-weight: 900;
+    }
+
+    .diego .score,
+    .diego .player-name {
+      color: var(--diego);
+    }
+
+    .mitch .score,
+    .mitch .player-name {
+      color: var(--mitch);
+    }
+
+    .vs {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .lead {
+      text-align: center;
+      margin: 22px 0 18px;
+      font-weight: 700;
+    }
+
+    .progress-group {
+      display: grid;
+      gap: 13px;
+    }
+
+    .progress-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 80px;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .progress-track {
+      height: 11px;
+      border-radius: 99px;
+      background: #0d0f11;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+    }
+
+    .progress-fill.diego {
+      background: var(--diego);
+    }
+
+    .progress-fill.mitch {
+      background: var(--mitch);
+    }
+
+    .progress-value {
+      text-align: right;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .section {
+      margin-top: 36px;
+    }
+
+    .section-title {
+      font-size: 23px;
+      margin-bottom: 14px;
+    }
+
+    .chart-card,
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .chart-wrap {
+      height: 360px;
+    }
+
+    .stats-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .player-card h3 {
+      margin-bottom: 18px;
+      font-size: 24px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .mini-stat {
+      background: var(--card2);
+      padding: 13px;
+      border-radius: 12px;
+    }
+
+    .mini-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .mini-stat strong {
+      font-size: 21px;
+    }
+
+    .accusi-table,
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 99px;
+      padding: 4px 8px;
+      font-size: 11px;
+      margin: 2px;
+      white-space: nowrap;
+    }
+
+    .badge.ok {
+      background: rgba(86,197,150,.15);
+      color: #75ddb3;
+    }
+
+    .badge.ko {
+      background: rgba(227,106,106,.13);
+      color: #ef8b8b;
+    }
+
+    .winner {
+      font-weight: 800;
+    }
+
+    footer {
+      margin-top: 55px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stats-two {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        width: min(100% - 18px, 1100px);
+        padding-top: 20px;
+      }
+
+      .scoreboard {
+        padding: 17px;
+      }
+
+      .score-main {
+        gap: 8px;
+      }
+
+      .progress-row {
+        grid-template-columns: 65px 1fr 60px;
+      }
+
+      .grid {
+        gap: 9px;
+      }
+
+      .stat {
+        padding: 14px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .chart-card {
+        padding: 12px;
+      }
+
+      .chart-wrap {
+        height: 270px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="eyebrow">Road to 1001</div>
+  <h1 class="title">Tresette</h1>
+  <p class="subtitle">Dieghito vs Mitch</p>
+
+  <div class="scoreboard">
+
+    <div class="score-main">
+
+      <div class="player diego">
+        <div class="player-name">Dieghito</div>
+        <div class="score" id="scoreDiego">0</div>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div class="player mitch">
+        <div class="player-name">Mitch</div>
+        <div class="score" id="scoreMitch">0</div>
+      </div>
+
+    </div>
+
+    <div class="lead" id="leadText"></div>
+
+    <div class="progress-group">
+
+      <div class="progress-row">
+        <strong>Dieghito</strong>
+
+        <div class="progress-track">
+          <div class="progress-fill diego" id="progressDiego"></div>
+        </div>
+
+        <span class="progress-value" id="progressDiegoText"></span>
+      </div>
+
+      <div class="progress-row">
+        <strong>Mitch</strong>
+
+        <div class="progress-track">
+          <div class="progress-fill mitch" id="progressMitch"></div>
+        </div>
+
+        <span class="progress-value" id="progressMitchText"></span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="stat">
+      <div class="stat-label">Partite</div>
+      <div class="stat-value" id="gamesPlayed">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Punti mancanti</div>
+      <div class="stat-value" id="pointsRemaining">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Leader</div>
+      <div class="stat-value" id="currentLeader">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Vantaggio</div>
+      <div class="stat-value" id="currentLead">0</div>
+    </div>
+
+  </div>
+
+
+  <section class="section">
+
+    <h2 class="section-title">Andamento della sfida</h2>
+
+    <div class="chart-card">
+      <h3>Punteggio cumulativo per partita</h3>
+
+      <div class="chart-wrap">
+        <canvas id="gameChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Punteggio cumulativo nel tempo</h3>
+
+      <div class="chart-wrap">
+        <canvas id="dateChart"></canvas>
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <h2 class="section-title">Statistiche</h2>
+
+    <div class="stats-two">
+
+      <div class="card player-card">
+        <h3 style="color:var(--diego)">Dieghito</h3>
+        <div class="mini-grid" id="statsDiego"></div>
+      </div>
+
+      <div class="card player-card">
+        <h3 style="color:var(--mitch)">Mitch</h3>
+        <div class="mini-grid" id="statsMitch"></div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <h2 class="section-title">Accusi</h2>
+
+    <div class="card">
+
+      <div class="table-scroll">
+
+        <table class="accusi-table">
+
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Dieghito</th>
+              <th>Mitch</th>
+            </tr>
+          </thead>
+
+          <tbody id="accusiStats"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <h2 class="section-title">Luoghi della sfida</h2>
+
+    <div class="card">
+      <div id="locationStats"></div>
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <h2 class="section-title">Storico partite</h2>
+
+    <div class="card table-scroll">
+
+      <table class="history-table">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Data</th>
+            <th>Luogo</th>
+            <th>Dieghito</th>
+            <th>Mitch</th>
+            <th>Accusi Dieghito</th>
+            <th>Accusi Mitch</th>
+          </tr>
+        </thead>
+
+        <tbody id="historyTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <footer>
+    Tresette 1001 — Dieghito vs Mitch
+  </footer>
+
+</div>
+
+
+<script>
+
+/*
+=========================================================
+           MODIFICA SOLO QUESTA PARTE
+=========================================================
+
+Ogni volta che giocate, aggiungi una nuova partita.
+
+TIPI DI ACCUSO CONSIGLIATI:
+
+tipo: "Seme"
+valore: "Denari"
+         "Coppe"
+         "Spade"
+         "Bastoni"
+
+tipo: "3 carte"
+valore: "Assi"
+         "Due"
+         "Tre"
+
+tipo: "4 carte"
+valore: "Assi"
+         "Due"
+         "Tre"
+
+fatto:
+true  = accuso fatto
+false = accuso dichiarato ma non fatto
+
+punti:
+3 normalmente
+4 per accuso da quattro carte
+
+ATTENZIONE:
+i punti degli accusi fatti devono essere GIÀ COMPRESI
+nei punti Diego / Mitch della partita.
+=========================================================
+*/
+
+const partite = [
+
+  {
+    data: "2026-11-02",
+    luogo: "Casa Dieghito",
+
+    diego: 7,
+    mitch: 4,
+
+    accusiDiego: [
+      {
+        tipo: "Seme",
+        valore: "Denari",
+        fatto: true,
+        punti: 3
+      }
+    ],
+
+    accusiMitch: []
+  },
+
+  {
+    data: "2026-11-05",
+    luogo: "Casa Mitch",
+
+    diego: 4,
+    mitch: 7,
+
+    accusiDiego: [],
+
+    accusiMitch: [
+      {
+        tipo: "3 carte",
+        valore: "Assi",
+        fatto: false,
+        punti: 3
+      }
+    ]
+  },
+
+  {
+    data: "2026-11-08",
+    luogo: "Bar",
+
+    diego: 8,
+    mitch: 6,
+
+    accusiDiego: [
+      {
+        tipo: "4 carte",
+        valore: "Due",
+        fatto: true,
+        punti: 4
+      }
+    ],
+
+    accusiMitch: [
+      {
+        tipo: "Seme",
+        valore: "Coppe",
+        fatto: true,
+        punti: 3
+      }
+    ]
+  }
+
+];
+
+/*
+=========================================================
+         DA QUI IN GIÙ NON SERVE MODIFICARE
+=========================================================
+*/
+
+const TARGET = 1001;
+
+const totalDiego = partite.reduce((s,p) => s + p.diego, 0);
+const totalMitch = partite.reduce((s,p) => s + p.mitch, 0);
+
+document.getElementById("scoreDiego").textContent = totalDiego;
+document.getElementById("scoreMitch").textContent = totalMitch;
+
+document.getElementById("gamesPlayed").textContent = partite.length;
+
+const maxScore = Math.max(totalDiego,totalMitch);
+
+document.getElementById("pointsRemaining").textContent =
+  Math.max(0,TARGET-maxScore);
+
+let leader = "Parità";
+let lead = 0;
+
+if(totalDiego > totalMitch){
+  leader = "Dieghito";
+  lead = totalDiego-totalMitch;
+}
+
+if(totalMitch > totalDiego){
+  leader = "Mitch";
+  lead = totalMitch-totalDiego;
+}
+
+document.getElementById("currentLeader").textContent = leader;
+document.getElementById("currentLead").textContent =
+  lead === 0 ? "—" : "+"+lead;
+
+document.getElementById("leadText").textContent =
+  lead === 0
+  ? "La sfida è in perfetta parità"
+  : leader + " è avanti di " + lead + " punti";
+
+const percentDiego = Math.min((totalDiego/TARGET)*100,100);
+const percentMitch = Math.min((totalMitch/TARGET)*100,100);
+
+document.getElementById("progressDiego").style.width =
+  percentDiego+"%";
+
+document.getElementById("progressMitch").style.width =
+  percentMitch+"%";
+
+document.getElementById("progressDiegoText").textContent =
+  totalDiego+" / "+TARGET;
+
+document.getElementById("progressMitchText").textContent =
+  totalMitch+" / "+TARGET;
+
+
+/* =========================
+   CUMULATIVI
+========================= */
+
+let cumulativeDiego = [];
+let cumulativeMitch = [];
+
+let d = 0;
+let m = 0;
+
+partite.forEach(p => {
+
+  d += p.diego;
+  m += p.mitch;
+
+  cumulativeDiego.push(d);
+  cumulativeMitch.push(m);
+
+});
+
+
+/* =========================
+   GRAFICO NUMERO PARTITA
+========================= */
+
+new Chart(
+  document.getElementById("gameChart"),
+  {
+    type: "line",
+
+    data: {
+
+      labels: partite.map((p,i)=>i+1),
+
+      datasets: [
+
+        {
+          label: "Dieghito",
+          data: cumulativeDiego,
+          borderColor: "#e0a33a",
+          backgroundColor: "#e0a33a",
+          tension: .25
+        },
+
+        {
+          label: "Mitch",
+          data: cumulativeMitch,
+          borderColor: "#4aa3df",
+          backgroundColor: "#4aa3df",
+          tension: .25
+        }
+
+      ]
+    },
+
+    options: {
+
+      responsive:true,
+      maintainAspectRatio:false,
+
+      interaction:{
+        mode:"index",
+        intersect:false
+      },
+
+      scales:{
+        x:{
+          title:{
+            display:true,
+            text:"Numero partita"
+          }
+        },
+
+        y:{
+          beginAtZero:true,
+
+          suggestedMax:TARGET,
+
+          title:{
+            display:true,
+            text:"Punti cumulativi"
+          }
+        }
+      }
+
+    }
+
+  }
+);
+
+
+/* =========================
+   GRAFICO DATA
+========================= */
+
+const dateLabels = partite.map(p => {
+
+  const date = new Date(p.data);
+
+  return date.toLocaleDateString(
+    "it-IT",
+    {
+      day:"2-digit",
+      month:"2-digit",
+      year:"2-digit"
+    }
+  );
+
+});
+
+new Chart(
+  document.getElementById("dateChart"),
+  {
+
+    type:"line",
+
+    data:{
+
+      labels:dateLabels,
+
+      datasets:[
+
+        {
+          label:"Dieghito",
+          data:cumulativeDiego,
+          borderColor:"#e0a33a",
+          backgroundColor:"#e0a33a",
+          tension:.25
+        },
+
+        {
+          label:"Mitch",
+          data:cumulativeMitch,
+          borderColor:"#4aa3df",
+          backgroundColor:"#4aa3df",
+          tension:.25
+        }
+
+      ]
+
+    },
+
+    options:{
+
+      responsive:true,
+      maintainAspectRatio:false,
+
+      interaction:{
+        mode:"index",
+        intersect:false
+      },
+
+      scales:{
+
+        x:{
+          title:{
+            display:true,
+            text:"Data"
+          }
+        },
+
+        y:{
+          beginAtZero:true,
+
+          suggestedMax:TARGET,
+
+          title:{
+            display:true,
+            text:"Punti cumulativi"
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+);
+
+
+/* =========================
+   STATISTICHE GIOCATORI
+========================= */
+
+function playerStats(player){
+
+  const opponent =
+    player === "diego"
+    ? "mitch"
+    : "diego";
+
+  const scores =
+    partite.map(p => p[player]);
+
+  let wins = 0;
+  let losses = 0;
+  let draws = 0;
+
+  let currentStreak = 0;
+  let bestStreak = 0;
+
+  partite.forEach(p=>{
+
+    if(p[player] > p[opponent]){
+
+      wins++;
+
+      currentStreak++;
+
+      bestStreak =
+        Math.max(bestStreak,currentStreak);
+
+    }
+
+    else{
+
+      if(p[player] < p[opponent]){
+        losses++;
+      }else{
+        draws++;
+      }
+
+      currentStreak=0;
+
+    }
+
+  });
+
+  const total =
+    scores.reduce((a,b)=>a+b,0);
+
+  const average =
+    scores.length
+    ? total/scores.length
+    : 0;
+
+  const best =
+    scores.length
+    ? Math.max(...scores)
+    : 0;
+
+  const worst =
+    scores.length
+    ? Math.min(...scores)
+    : 0;
+
+  const winPercentage =
+    partite.length
+    ? wins/partite.length*100
+    : 0;
+
+  return {
+
+    total,
+    average,
+    best,
+    worst,
+    wins,
+    losses,
+    draws,
+    winPercentage,
+    bestStreak,
+    currentStreak
+
+  };
+
+}
+
+
+function renderStats(id,stats){
+
+  const data = [
+
+    ["Media punti",stats.average.toFixed(2)],
+    ["Partite vinte",stats.wins],
+    ["% vittorie",stats.winPercentage.toFixed(1)+"%"],
+    ["Miglior partita",stats.best],
+    ["Peggior partita",stats.worst],
+    ["Serie max",stats.bestStreak],
+    ["Serie attuale",stats.currentStreak],
+    ["Pareggi",stats.draws]
+
+  ];
+
+  document.getElementById(id).innerHTML =
+    data.map(x=>`
+
+      <div class="mini-stat">
+        <span>${x[0]}</span>
+        <strong>${x[1]}</strong>
+      </div>
+
+    `).join("");
+
+}
+
+renderStats(
+  "statsDiego",
+  playerStats("diego")
+);
+
+renderStats(
+  "statsMitch",
+  playerStats("mitch")
+);
+
+
+/* =========================
+   ACCUSI
+========================= */
+
+function allAccusi(player){
+
+  const field =
+    player === "diego"
+    ? "accusiDiego"
+    : "accusiMitch";
+
+  return partite.flatMap(
+    p => p[field] || []
+  );
+
+}
+
+const accusiDiego =
+  allAccusi("diego");
+
+const accusiMitch =
+  allAccusi("mitch");
+
+
+function accusoSummary(accusi){
+
+  const declared =
+    accusi.length;
+
+  const successful =
+    accusi.filter(a=>a.fatto).length;
+
+  const failed =
+    declared-successful;
+
+  const successRate =
+    declared
+    ? successful/declared*100
+    : 0;
+
+  const points =
+    accusi
+      .filter(a=>a.fatto)
+      .reduce(
+        (s,a)=>s+(a.punti || 0),
+        0
+      );
+
+  return {
+    declared,
+    successful,
+    failed,
+    successRate,
+    points
+  };
+
+}
+
+
+function addAccusoPlayerStats(){
+
+  const d =
+    accusoSummary(accusiDiego);
+
+  const m =
+    accusoSummary(accusiMitch);
+
+  const diegoBox =
+    document.getElementById("statsDiego");
+
+  const mitchBox =
+    document.getElementById("statsMitch");
+
+  const extraDiego = [
+
+    ["Accusi dichiarati",d.declared],
+    ["Accusi fatti",d.successful],
+    ["Conversione",d.successRate.toFixed(1)+"%"],
+    ["Punti da accusi",d.points]
+
+  ];
+
+  const extraMitch = [
+
+    ["Accusi dichiarati",m.declared],
+    ["Accusi fatti",m.successful],
+    ["Conversione",m.successRate.toFixed(1)+"%"],
+    ["Punti da accusi",m.points]
+
+  ];
+
+  diegoBox.innerHTML +=
+    extraDiego.map(x=>`
+
+      <div class="mini-stat">
+        <span>${x[0]}</span>
+        <strong>${x[1]}</strong>
+      </div>
+
+    `).join("");
+
+  mitchBox.innerHTML +=
+    extraMitch.map(x=>`
+
+      <div class="mini-stat">
+        <span>${x[0]}</span>
+        <strong>${x[1]}</strong>
+      </div>
+
+    `).join("");
+
+}
+
+addAccusoPlayerStats();
+
+
+/* =========================
+   TABELLA TIPOLOGIA ACCUSI
+========================= */
+
+const accusoTypes = [
+
+  ["Seme","Denari"],
+  ["Seme","Coppe"],
+  ["Seme","Spade"],
+  ["Seme","Bastoni"],
+
+  ["3 carte","Assi"],
+  ["3 carte","Due"],
+  ["3 carte","Tre"],
+
+  ["4 carte","Assi"],
+  ["4 carte","Due"],
+  ["4 carte","Tre"]
+
+];
+
+
+function countAccuso(accusi,type,value){
+
+  return accusi.filter(
+    a =>
+      a.tipo === type &&
+      a.valore === value
+  ).length;
+
+}
+
+
+document.getElementById("accusiStats").innerHTML =
+
+  accusoTypes.map(([type,value])=>`
+
+    <tr>
+
+      <td>${type} — ${value}</td>
+
+      <td>
+        ${countAccuso(
+          accusiDiego,
+          type,
+          value
+        )}
+      </td>
+
+      <td>
+        ${countAccuso(
+          accusiMitch,
+          type,
+          value
+        )}
+      </td>
+
+    </tr>
+
+  `).join("");
+
+
+/* =========================
+   STATISTICHE LUOGO
+========================= */
+
+const locations = {};
+
+partite.forEach(p=>{
+
+  if(!locations[p.luogo]){
+
+    locations[p.luogo] = {
+      games:0,
+      diego:0,
+      mitch:0
+    };
+
+  }
+
+  locations[p.luogo].games++;
+
+  locations[p.luogo].diego += p.diego;
+  locations[p.luogo].mitch += p.mitch;
+
+});
+
+
+document.getElementById("locationStats").innerHTML =
+
+  Object.entries(locations)
+    .map(([name,data])=>{
+
+      const avgD =
+        data.diego/data.games;
+
+      const avgM =
+        data.mitch/data.games;
+
+      return `
+
+        <div
+          style="
+            padding:14px 0;
+            border-bottom:1px solid var(--border)
+          "
+        >
+
+          <strong>${name}</strong>
+
+          <div
+            style="
+              margin-top:5px;
+              color:var(--muted)
+            "
+          >
+            ${data.games} partite ·
+            Dieghito ${avgD.toFixed(2)} pt/partita ·
+            Mitch ${avgM.toFixed(2)} pt/partita
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+/* =========================
+   FORMATO ACCUSI
+========================= */
+
+function formatAccusi(accusi){
+
+  if(!accusi || accusi.length===0){
+    return "—";
+  }
+
+  return accusi.map(a=>{
+
+    const classe =
+      a.fatto
+      ? "ok"
+      : "ko";
+
+    const stato =
+      a.fatto
+      ? "fatto"
+      : "non fatto";
+
+    return `
+
+      <span class="badge ${classe}">
+        ${a.tipo} ${a.valore} · ${stato}
+      </span>
+
+    `;
+
+  }).join("");
+
+}
+
+
+/* =========================
+   STORICO PARTITE
+========================= */
+
+document.getElementById("historyTable").innerHTML =
+
+  partite.map((p,i)=>{
+
+    const dWinner =
+      p.diego > p.mitch
+      ? "winner"
+      : "";
+
+    const mWinner =
+      p.mitch > p.diego
+      ? "winner"
+      : "";
+
+    const date =
+      new Date(p.data)
+      .toLocaleDateString("it-IT");
+
+    return `
+
+      <tr>
+
+        <td>${i+1}</td>
+
+        <td>${date}</td>
+
+        <td>${p.luogo}</td>
+
+        <td class="${dWinner}">
+          ${p.diego}
+        </td>
+
+        <td class="${mWinner}">
+          ${p.mitch}
+        </td>
+
+        <td>
+          ${formatAccusi(
+            p.accusiDiego
+          )}
+        </td>
+
+        <td>
+          ${formatAccusi(
+            p.accusiMitch
+          )}
+        </td>
+
+      </tr>
+
+    `;
+
+  }).join("");
+
+</script>
+
+</body>
+</html>
